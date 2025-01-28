@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app
+  labels:
+    app: python-app
+  namespace: crewai  # Added namespace for your app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      containers:
+      - name: python-container
+        image: us-central1-docker.pkg.dev/bt-dev-388506/milvus2/crewai-backend:latest # Replace with your image and tag
+        ports:
+        - containerPort: 9001
+        env:
+        - name: MODEL
+          value: "gpt-4o" # Adjust model name as needed
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: openai-api-secret
+              key: OPENAI_API_KEY
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-app-service
+  namespace: crewai  # Added namespace for your service
+spec:
+  selector:
+    app: python-app
+  ports:
+    - protocol: TCP
+      port: 9001
+      targetPort: 9001
+  type: LoadBalancer
+  loadBalancerIP: 34.27.213.229  # Replace with valid LoadBalancer IP if needed
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openai-api-secret
+  namespace: crewai  # Added namespace for your secret
+type: Opaque
+data:
+  OPENAI_API_KEY: c2stcHJvai1EU3B6YVV3a0R2cTJ5LXUyeHJTRDlRMDFDTHdzTmVVdkFaejZMeHVTUFZBTlFlM1lfU2xvM0JpangzXzVDQjgwVzJTMHRYR2VEbFQzQmxia0ZKQ1Z2Ujh2WVZoeUZ2bW53aUg5c3lNbmdWaEpERnVqTGlUYTBwTGktRU16cm1hc3hLM3NWTGtoQkRuQWhXTXFTUmt3Y1V6c3RfRUE= # Replace with your base64-encoded key

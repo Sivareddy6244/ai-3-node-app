@@ -1,0 +1,181 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-server
+  namespace: bilvantisai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-server
+  template:
+    metadata:
+      labels:
+        app: mongo-server
+    spec:
+      nodeSelector:
+        role: primary
+      containers:
+        - name: mongo-server
+          image: us-central1-docker.pkg.dev/bt-dev-388506/milvus2/mongo:latest
+          ports:
+            - containerPort: 27017
+          env:
+            - name: MONGO_HOST
+              value: mongo-server
+            - name: ES_HOST
+              value: elasticsearch-server
+            - name: CHROMA_HOST
+              value: chroma-server
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: OPENAI_API_KEY
+            - name: ELASTICSEARCH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: ELASTICSEARCH_API_KEY
+            - name: ELASTICSEARCH_CLOUD_ID
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: ELASTICSEARCH_CLOUD_ID
+            - name: NEO4J_URI
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: NEO4J_URI
+            - name: NEO4J_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: NEO4J_USERNAME
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: NEO4J_PASSWORD
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: GROQ_API_KEY
+            - name: TAVILY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: TAVILY_API_KEY
+            - name: LANGCHAIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: LANGCHAIN_API_KEY
+            - name: LANGCHAIN_PROJECT
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: LANGCHAIN_PROJECT
+            - name: LANGCHAIN_TRACING_V2
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: LANGCHAIN_TRACING_V2
+            - name: KMP_DUPLICATE_LIB_OK
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: KMP_DUPLICATE_LIB_OK
+            - name: HUGGING_FACE_HUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: HUGGING_FACE_HUB_KEY
+            - name: TOKENIZERS_PARALLELISM
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: TOKENIZERS_PARALLELISM
+            - name: GOOGLE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: GOOGLE_API_KEY
+            - name: SERVICE_ACC
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: SERVICE_ACC
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: AWS_SECRET_ACCESS_KEY
+          # volumeMounts:
+          #   - name: mongo-storage
+          #     mountPath: /data/db  # Mount MongoDB data directory inside the container
+          volumeMounts:
+            - name: mongo-storage
+              mountPath: /data/db  # Mount MongoDB data directory inside the container
+          # resources:
+          #   requests:
+          #     memory: "4Gi"      # MongoDB memory request
+          #     cpu: "1"           # MongoDB CPU request
+          #     ephemeral-storage: "10Gi"  # MongoDB ephemeral storage request
+          #   limits:
+          #     memory: "8Gi"      # MongoDB memory limit
+          #     cpu: "2"           # MongoDB CPU limit
+          #     ephemeral-storage: "20Gi"  
+          resources:
+            requests:
+              memory: "4Gi"  # MongoDB memory request
+              cpu: "1"       # MongoDB CPU request
+            limits:
+              memory: "8Gi"  # MongoDB memory limit
+              cpu: "2"  
+      volumes:
+        - name: mongo-storage
+          persistentVolumeClaim:
+            claimName: mongo-pvc  # Use PVC for persistent storage,
+          # resources:
+          #   requests:
+          #     memory: "512Mi"
+          #     cpu: "500m"
+          #   limits:
+          #     memory: "1Gi"
+          #     cpu: "1"
+      #     resources:
+      #       requests:
+      #         memory: "4Gi"      # MongoDB memory request
+      #         cpu: "1"           # MongoDB CPU request
+      #         ephemeral-storage: "10Gi"  # MongoDB ephemeral storage request
+      #       limits:
+      #         memory: "8Gi"      # MongoDB memory limit
+      #         cpu: "2"           # MongoDB CPU limit
+      #         ephemeral-storage: "20Gi"  
+      # volumes:
+      #   - name: mongo-storage
+      #     hostPath:
+      #       path: /mnt/mongo-data  # Host directory where the volume is mounted on the EC2 instance
+      #       type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-server
+  namespace: bilvantisai
+spec:
+  selector:
+    app: mongo-server
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+  type: ClusterIP

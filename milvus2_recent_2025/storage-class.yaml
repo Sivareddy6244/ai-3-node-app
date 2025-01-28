@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: surekha-storage-class
+provisioner: pd.csi.storage.gke.io
+parameters:
+  type: pd-standard  # pd-balanced or pd-ssd can be used based on needs
+  csi.storage.k8s.io/fstype: ext4  # Preferred key for CSI drivers
+reclaimPolicy: Retain  # Keeps the PV even after PVC deletion
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true  
+

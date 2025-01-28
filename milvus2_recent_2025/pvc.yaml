@@ -1,0 +1,179 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: milvus-pvc
+  namespace: bilvantisai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "100Gi"
+  volumeName: milvus-pv
+  storageClassName: surekha-storage-class
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: etcd-pvc
+  namespace: bilvantisai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "100Gi"
+  volumeName: etcd-pv
+  storageClassName: surekha-storage-class
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-pvc
+  namespace: bilvantisai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "100Gi"
+  volumeName: minio-pv
+  storageClassName: surekha-storage-class
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+  namespace: bilvantisai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "100Gi"
+  volumeName: mongo-pv
+  storageClassName: surekha-storage-class
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: elasticsearch-pvc
+  namespace: bilvantisai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "100Gi"
+  volumeName: elasticsearch-pv
+  storageClassName: surekha-storage-class
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chroma-pvc
+  namespace: bilvantisai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: "100Gi"
+  volumeName: chroma-pv
+  storageClassName: surekha-storage-class
+
+
+
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: milvus-pvc
+#   namespace: bilvantisai
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: "100Gi"
+#   volumeName: milvus-pv
+#   storageClassName: surekha-storage-class
+
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: etcd-pvc
+#   namespace: bilvantisai
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: "100Gi"
+#   volumeName: etcd-pv
+#   storageClassName: surekha-storage-class
+
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: minio-pvc
+#   namespace: bilvantisai
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: "100Gi"
+#   volumeName: minio-pv
+#   storageClassName: surekha-storage-class
+
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: mongo-pvc
+#   namespace: bilvantisai
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: "100Gi"
+#   volumeName: mongo-pv
+#   storageClassName: surekha-storage-class
+
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: elasticsearch-pvc
+#   namespace: bilvantisai
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: "100Gi"
+#   volumeName: elasticsearch-pv
+#   storageClassName: surekha-storage-class
+
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: chroma-pvc
+#   namespace: bilvantisai
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: "100Gi"
+#   volumeName: chroma-pv
+#   storageClassName: surekha-storage-class

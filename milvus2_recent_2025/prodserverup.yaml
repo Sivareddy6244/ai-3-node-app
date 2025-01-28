@@ -1,0 +1,162 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prod-server
+  namespace: bilvantisai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prod-server
+  template:
+    metadata:
+      labels:
+        app: prod-server
+    spec:
+      nodeSelector:
+        role: secondary
+      containers:
+        - name: prod-server
+          image: us-central1-docker.pkg.dev/bt-dev-388506/milvus2/rag_syn-prod-server:latest
+          ports:
+            - containerPort: 9000
+            - containerPort: 9001
+            - containerPort: 9002
+          env:
+            - name: MONGO_HOST
+              value: mongo-server
+            - name: ES_HOST
+              value: elasticsearch-server
+            - name: CHROMA_HOST
+              value: chroma-server
+            - name: MILVUS_HOST
+              value: "milvus-standalone"
+            - name: MILVUS_PORT
+              value: "19530"
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: OPENAI_API_KEY
+            - name: ELASTICSEARCH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: ELASTICSEARCH_API_KEY
+            - name: ELASTICSEARCH_CLOUD_ID
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: ELASTICSEARCH_CLOUD_ID
+            - name: NEO4J_URI
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: NEO4J_URI
+            - name: NEO4J_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: NEO4J_USERNAME
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: NEO4J_PASSWORD
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: GROQ_API_KEY
+            - name: TAVILY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: TAVILY_API_KEY
+            - name: LANGCHAIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: LANGCHAIN_API_KEY
+            - name: LANGCHAIN_PROJECT
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: LANGCHAIN_PROJECT
+            - name: LANGCHAIN_TRACING_V2
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: LANGCHAIN_TRACING_V2
+            - name: KMP_DUPLICATE_LIB_OK
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: KMP_DUPLICATE_LIB_OK
+            - name: HUGGING_FACE_HUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: HUGGING_FACE_HUB_KEY
+            - name: TOKENIZERS_PARALLELISM
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: TOKENIZERS_PARALLELISM
+            - name: GOOGLE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: GOOGLE_API_KEY
+            - name: SERVICE_ACC
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: SERVICE_ACC
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: ETCD_AUTO_COMPACTION_MODE
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: ETCD_AUTO_COMPACTION_MODE
+            - name: ETCD_AUTO_COMPACTION_RETENTION
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: ETCD_AUTO_COMPACTION_RETENTION
+            - name: ETCD_QUOTA_BACKEND_BYTES
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: ETCD_QUOTA_BACKEND_BYTES
+            - name: ETCD_SNAPSHOT_COUNT
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: ETCD_SNAPSHOT_COUNT
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: MINIO_SECRET_KEY
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: "2"
+            limits:
+              memory: "8Gi"
+              cpu: "4"

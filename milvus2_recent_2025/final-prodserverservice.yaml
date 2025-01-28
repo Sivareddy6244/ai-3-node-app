@@ -1,0 +1,24 @@
+#  Production Server Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: prod-server
+  namespace: bilvantisai
+spec:
+  selector:
+    app: prod-server
+  ports:
+    - name: port-9000
+      protocol: TCP
+      port: 9000
+      targetPort: 9000
+    - name: port-9001
+      protocol: TCP
+      port: 9001
+      targetPort: 9001
+    - name: port-9002
+      protocol: TCP
+      port: 9002
+      targetPort: 9002
+  type: LoadBalancer
+  loadBalancerIP: 34.16.35.146

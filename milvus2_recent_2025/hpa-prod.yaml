@@ -1,0 +1,20 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: prod-server-hpa
+  namespace: bilvantisai
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: prod-server
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    # Scaling based on CPU utilization: 5% of allocated CPU
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 5  # Trigger scaling if CPU utilization exceeds 5% of allocated CPU

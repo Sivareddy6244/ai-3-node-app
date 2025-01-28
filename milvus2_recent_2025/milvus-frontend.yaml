@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: milvus-frontend
+  namespace: bilvantisai
+  labels:
+    app: milvus-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: milvus-frontend
+  template:
+    metadata:
+      labels:
+        app: milvus-frontend
+    spec:
+      nodeSelector:
+        role: tertiary
+      containers:
+        - name: milvus-frontend
+          image: us-central1-docker.pkg.dev/pre-onboarding-427811/milvus/milvus-frontend:latest
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "2Gi"  # Memory request
+              cpu: "1"       # CPU request
+            limits:
+              memory: "4Gi"  # Memory limit
+              cpu: "2" 
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: milvus-frontend
+  namespace: bilvantisai
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 35.188.75.186
+
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: milvus-frontend

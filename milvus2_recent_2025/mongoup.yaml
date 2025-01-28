@@ -1,0 +1,202 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-server
+  namespace: bilvantisai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-server
+  template:
+    metadata:
+      labels:
+        app: mongo-server
+    spec:
+      nodeSelector:
+        role: primary
+      containers:
+        - name: mongo-server
+          image: us-central1-docker.pkg.dev/bt-dev-388506/milvus2/mongo:latest
+          ports:
+            - containerPort: 27017
+          env:
+            - name: MONGO_HOST
+              value: mongo-server
+            - name: ES_HOST
+              value: elasticsearch-server
+            - name: CHROMA_HOST
+              value: chroma-server
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: OPENAI_API_KEY
+            - name: ELASTICSEARCH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: ELASTICSEARCH_API_KEY
+            - name: ELASTICSEARCH_CLOUD_ID
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: ELASTICSEARCH_CLOUD_ID
+            - name: NEO4J_URI
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: NEO4J_URI
+            - name: NEO4J_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: NEO4J_USERNAME
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: NEO4J_PASSWORD
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: GROQ_API_KEY
+            - name: TAVILY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: TAVILY_API_KEY
+            - name: LANGCHAIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: LANGCHAIN_API_KEY
+            - name: LANGCHAIN_PROJECT
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: LANGCHAIN_PROJECT
+            - name: LANGCHAIN_TRACING_V2
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: LANGCHAIN_TRACING_V2
+            - name: KMP_DUPLICATE_LIB_OK
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: KMP_DUPLICATE_LIB_OK
+            - name: HUGGING_FACE_HUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: HUGGING_FACE_HUB_KEY
+            - name: TOKENIZERS_PARALLELISM
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: TOKENIZERS_PARALLELISM
+            - name: GOOGLE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: GOOGLE_API_KEY
+            - name: SERVICE_ACC
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: SERVICE_ACC
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: TEAMS_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: TEAMS_WEBHOOK_URL
+            - name: OUTGOING_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: OUTGOING_WEBHOOK_SECRET
+            - name: JIRA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: JIRA_API_KEY
+            - name: JIRA_INSTANCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: JIRA_INSTANCE_URL
+            - name: BUGZILLA_URL
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: BUGZILLA_URL
+            - name: BUGZILLA_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: BUGZILLA_API_KEY
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: SLACK_WEBHOOK_URL
+            - name: SLACK_SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: SLACK_SIGNING_SECRET
+            - name: SLACK_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: SLACK_API_TOKEN
+            - name: SLACK_CHANNEL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: SLACK_CHANNEL_ID
+            - name: SLACK_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: SLACK_BOT_TOKEN
+          volumeMounts:
+            - name: mongo-storage
+              mountPath: /data/db
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: "1"
+            limits:
+              memory: "8Gi"
+              cpu: "2"
+      volumes:
+        - name: mongo-storage
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-server
+  namespace: bilvantisai
+spec:
+  selector:
+    app: mongo-server
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+  type: ClusterIP

@@ -1,0 +1,184 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch-server
+  namespace: bilvantisai
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch-server
+  template:
+    metadata:
+      labels:
+        app: elasticsearch-server
+    spec:
+      # priorityClassName: high-priority
+      nodeSelector:
+        role: primary
+      initContainers:
+      - name: busybox
+        image: busybox:1.28
+        command: ['sh', '-c', "chown -R 1000:1000 /usr/share/elasticsearch/data"]
+        volumeMounts:
+        - name: elasticsearch-storage
+          mountPath: /usr/share/elasticsearch/data
+      containers:
+        - name: elasticsearch-server
+          image: us-central1-docker.pkg.dev/bt-dev-388506/milvus2/rag_syn-elasticsearch-server:latest
+          ports:
+            - containerPort: 9200
+          env:
+            - name: MONGO_HOST
+              value: mongo-server
+            - name: ES_JAVA_OPTS
+              value: "-Xms8g -Xmx8g -XX:+UseG1GC -XX:G1ReservePercent=25"
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: cluster.name
+              value: "elasticsearch-cluster"
+            - name: discovery.type
+              value: "single-node"
+            - name: ES_HOST
+              value: elasticsearch-server
+            - name: CHROMA_HOST
+              value: chroma-server
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: OPENAI_API_KEY
+            - name: ELASTICSEARCH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: ELASTICSEARCH_API_KEY
+            - name: ELASTICSEARCH_CLOUD_ID
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: ELASTICSEARCH_CLOUD_ID
+            - name: NEO4J_URI
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: NEO4J_URI
+            - name: NEO4J_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: NEO4J_USERNAME
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: NEO4J_PASSWORD
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: GROQ_API_KEY
+            - name: TAVILY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: TAVILY_API_KEY
+            - name: LANGCHAIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: LANGCHAIN_API_KEY
+            - name: LANGCHAIN_PROJECT
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: LANGCHAIN_PROJECT
+            - name: LANGCHAIN_TRACING_V2
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: LANGCHAIN_TRACING_V2
+            - name: KMP_DUPLICATE_LIB_OK
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: KMP_DUPLICATE_LIB_OK
+            - name: HUGGING_FACE_HUB_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: HUGGING_FACE_HUB_KEY
+            - name: TOKENIZERS_PARALLELISM
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: TOKENIZERS_PARALLELISM
+            - name: GOOGLE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: GOOGLE_API_KEY
+            - name: SERVICE_ACC
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: SERVICE_ACC
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: my-env-secret-bilvantisai
+                  key: AWS_SECRET_ACCESS_KEY
+          resources:
+            requests:
+              memory: "16Gi"
+              cpu: "4"
+            limits:
+              memory: "24Gi"
+              cpu: "6"
+          volumeMounts:
+            - name: elasticsearch-storage
+              mountPath: /usr/share/elasticsearch/data
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+      volumes:
+        - name: elasticsearch-storage
+          persistentVolumeClaim:
+            claimName: elasticsearch-pvc
+      #     volumeMounts:
+      #       - name: elasticsearch-storage
+      #         mountPath: /usr/share/elasticsearch/data  # Mounting PVC for Elasticsearch data
+      # volumes:
+      #   - name: elasticsearch-storage
+      #     hostPath:
+      #       path: /mnt/elasticsearch  # Host path for the volume on EC2 instance
+      #       type: DirectoryOrCreate  # Ensures the directory is created if it doesn't exist
+      #     volumeMounts:
+      #       - name: elasticsearch-storage
+      #         mountPath: /usr/share/elasticsearch/data
+      # volumes:
+      #   - name: elasticsearch-storage
+      #     persistentVolumeClaim:
+      #       claimName: elasticsearch-pvc  
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-server
+  namespace: bilvantisai
+spec:
+  selector:
+    app: elasticsearch-server
+  ports:
+    - protocol: TCP
+      port: 9200
+      targetPort: 9200
+  type: ClusterIP
+
